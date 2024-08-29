@@ -1,0 +1,58 @@
+.card {
+    border: 1px solid white;
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    transition: all 500ms ease 300ms;
+}
+
+.card:hover {
+    box-shadow: 0 0 1rem 0.5rem white;
+    cursor: pointer;
+}
+
+.card.selected {
+    border: 4px solid white;
+}
+
+dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+}
+
+.modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal {
+    width: 50vw;
+    min-width: 450px;
+    background-color: #242424;
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid white;
+}
+
+.modal:has(.modal-header) {
+    padding: 0.5rem 1rem 2rem 1rem;
+}
+
+.modal-header {
+    width: 100%;
+    padding: 0.5rem 0 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
