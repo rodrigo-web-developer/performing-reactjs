@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCustomers } from "../../services";
 import "./index.css";
 import CustomerCard from "../../components/CustomerCard";
@@ -45,6 +45,7 @@ export default function Home() {
 
     useEffect(() => {
         fetchData();
+
     }, []);
 
     const toggleSelected = (customer) => {
@@ -56,6 +57,11 @@ export default function Home() {
         );
     }
 
+    const clearSelected = () => {
+        data.forEach(x => x.selected = false);
+        setSelected(() => []);
+    }
+
     return data ? (
         <main className="container">
             <div className="row">
@@ -63,6 +69,8 @@ export default function Home() {
                 <button className={ascending ? "active" : ""} onClick={() => setAscending(true)} type="button">A-Z</button>
                 <button className={ascending === false ? "active" : ""} onClick={() => setAscending(false)} type="button">Z-A</button>
                 <span>Total: {selected.length}</span>
+
+                {selected.length > 0 && <button onClick={clearSelected} type="button">Clear</button>}
             </div>
             <div className="grid">
                 {showData.map(x =>
