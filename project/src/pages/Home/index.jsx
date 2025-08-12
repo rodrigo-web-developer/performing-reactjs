@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import { getCustomers } from "../../services";
 import "./index.css";
@@ -10,7 +10,8 @@ export default function Home() {
     const [search, setSearch] = useState("");
     const [customer, setCustomer] = useState();
     const [ascending, setAscending] = useState();
-    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [selectedCount, setSelectedCount] = useState(0);
+    const selectedIdsRef = useRef(new Set());
 
     const fetchData = async () => {
         const res = await getCustomers();
@@ -46,20 +47,19 @@ export default function Home() {
         return resultData;
     }, [data, search, ascending]);
 
-    const toggleSelected = useCallback((customerId) => {
-        setSelectedIds(prevSelected => {
-            const newSelected = new Set(prevSelected);
-            if (newSelected.has(customerId)) {
-                newSelected.delete(customerId);
-            } else {
-                newSelected.add(customerId);
-            }
-            return newSelected;
-        });
+    const toggleSelected = useCallback((customerId, isSelected) => {
+        if (isSelected) {
+            selectedIdsRef.current.add(customerId);
+        } else {
+            selectedIdsRef.current.delete(customerId);
+        }
+        setSelectedCount(selectedIdsRef.current.size);
     }, []);
 
     const clearSelected = useCallback(() => {
-        setSelectedIds(new Set());
+        selectedIdsRef.current.clear();
+        setSelectedCount(0);
+        window.dispatchEvent(new CustomEvent('clearSelection'));
     }, []);
 
     const handleSearchChange = useCallback((e) => {
@@ -105,9 +105,9 @@ export default function Home() {
                 >
                     Z-A
                 </button>
-                <span>Total: {selectedIds.size}</span>
+                <span>Total: {selectedCount}</span>
 
-                {selectedIds.size > 0 && (
+                {selectedCount > 0 && (
                     <button onClick={clearSelected} type="button">Clear</button>
                 )}
             </div>
@@ -116,8 +116,7 @@ export default function Home() {
                     <CustomerCard
                         key={customer.id}
                         customer={customer}
-                        selected={selectedIds.has(customer.id)}
-                        onClick={() => toggleSelected(customer.id)}
+                        onSelectionChange={toggleSelected}
                         onEdit={() => handleEditCustomer(customer)}
                     />
                 )}

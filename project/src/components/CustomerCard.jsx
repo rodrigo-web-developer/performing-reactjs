@@ -1,14 +1,30 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import "./index.css"
 
 function CustomerCard({
     customer,
-    selected,
-    onClick,
+    onSelectionChange,
     onEdit
 }) {
-    return (<div className={"card " + (selected ? "selected" : "")} onClick={onClick}>
+    const [isSelected, setIsSelected] = useState(false);
+
+    useEffect(() => {
+        const handleClearSelection = () => {
+            setIsSelected(false);
+        };
+        
+        window.addEventListener('clearSelection', handleClearSelection);
+        return () => window.removeEventListener('clearSelection', handleClearSelection);
+    }, []);
+
+    const handleClick = () => {
+        const newSelectedState = !isSelected;
+        setIsSelected(newSelectedState);
+        onSelectionChange(customer.id, newSelectedState);
+    };
+
+    return (<div className={"card " + (isSelected ? "selected" : "")} onClick={handleClick}>
         <h4>{customer.id}</h4>
         <dl>
             <dt>Name:</dt>
@@ -37,8 +53,7 @@ CustomerCard.propTypes = {
         phone: PropTypes.string.isRequired,
         jobTitle: PropTypes.string.isRequired
     }).isRequired,
-    selected: PropTypes.bool,
-    onClick: PropTypes.func.isRequired,
+    onSelectionChange: PropTypes.func.isRequired,
     onEdit: PropTypes.func.isRequired
 };
 
