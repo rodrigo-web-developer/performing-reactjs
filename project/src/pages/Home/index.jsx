@@ -10,7 +10,7 @@ export default function Home() {
     const [search, setSearch] = useState("");
     const [customer, setCustomer] = useState();
     const [ascending, setAscending] = useState();
-    const [selected, setSelected] = useState([]);
+    const [selectedIds, setSelectedIds] = useState(new Set());
 
     const fetchData = async () => {
         const res = await getCustomers();
@@ -47,27 +47,19 @@ export default function Home() {
     }, [data, search, ascending]);
 
     const toggleSelected = useCallback((customerId) => {
-        setData(prevData => 
-            prevData.map(customer => 
-                customer.id === customerId 
-                    ? { ...customer, selected: !customer.selected }
-                    : customer
-            )
-        );
-        setSelected(prevSelected => {
-            const customer = data.find(c => c.id === customerId);
-            const newSelectedState = !customer.selected;
-            return newSelectedState
-                ? [...prevSelected, customerId]
-                : prevSelected.filter(id => id !== customerId);
+        setSelectedIds(prevSelected => {
+            const newSelected = new Set(prevSelected);
+            if (newSelected.has(customerId)) {
+                newSelected.delete(customerId);
+            } else {
+                newSelected.add(customerId);
+            }
+            return newSelected;
         });
-    }, [data]);
+    }, []);
 
     const clearSelected = useCallback(() => {
-        setData(prevData => 
-            prevData.map(customer => ({ ...customer, selected: false }))
-        );
-        setSelected([]);
+        setSelectedIds(new Set());
     }, []);
 
     const handleSearchChange = useCallback((e) => {
@@ -113,9 +105,9 @@ export default function Home() {
                 >
                     Z-A
                 </button>
-                <span>Total: {selected.length}</span>
+                <span>Total: {selectedIds.size}</span>
 
-                {selected.length > 0 && (
+                {selectedIds.size > 0 && (
                     <button onClick={clearSelected} type="button">Clear</button>
                 )}
             </div>
@@ -124,7 +116,7 @@ export default function Home() {
                     <CustomerCard
                         key={customer.id}
                         customer={customer}
-                        selected={customer.selected}
+                        selected={selectedIds.has(customer.id)}
                         onClick={() => toggleSelected(customer.id)}
                         onEdit={() => handleEditCustomer(customer)}
                     />
