@@ -1,6 +1,8 @@
+import { memo } from "react";
+import PropTypes from "prop-types";
 import "./index.css"
 
-export default function CustomerCard({
+function CustomerCard({
     customer,
     selected,
     onClick,
@@ -26,3 +28,18 @@ export default function CustomerCard({
         </div>
     </div>)
 }
+
+CustomerCard.propTypes = {
+    customer: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        name: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+        phone: PropTypes.string.isRequired,
+        jobTitle: PropTypes.string.isRequired
+    }).isRequired,
+    selected: PropTypes.bool,
+    onClick: PropTypes.func.isRequired,
+    onEdit: PropTypes.func.isRequired
+};
+
+export default memo(CustomerCard);
